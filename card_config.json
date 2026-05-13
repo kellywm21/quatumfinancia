@@ -1,0 +1,15 @@
+{
+  "cardholder": {
+    "account_token": "6018443c-8f41-405a-9498-b54ff74d1f4b",
+    "email": "business20260509114701@advancia.com",
+    "business_name": "Advancia Business Elite"
+  },
+  "card": {
+    "token": "7f36ee2d-410c-4f37-a533-3ea61c758a18",
+    "last_4": "3823",
+    "exp_month": 5,
+    "exp_year": 2031,
+    "type": "VIRTUAL",
+    "financial_account": "6018443c-8f41-405a-9498-b54ff74d1f4b"
+  }
+}
