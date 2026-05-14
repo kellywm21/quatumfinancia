@@ -25,15 +25,6 @@ class Cardholder(Base):
     status = Column(String, default="active")
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    __tablename__ = "cardholders"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    account_token = Column(String, unique=True, index=True)
-    email = Column(String, unique=True, index=True)
-    business_name = Column(String, nullable=True)
-    status = Column(String, default="active")
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class Payment(Base):
     __tablename__ = "payments"

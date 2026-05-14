@@ -1,5 +1,7 @@
 # Advancia Payledger - Payment Processing API with Authentication
 
+[![CI](https://github.com/advanciahealthcare-ops/advancia-payledger/actions/workflows/ci.yml/badge.svg)](https://github.com/advanciahealthcare-ops/advancia-payledger/actions/workflows/ci.yml)
+
 A FastAPI-based payment processing platform with Lithic card issuance
 integration and JWT authentication.
 
@@ -12,8 +14,9 @@ integration and JWT authentication.
 - **💰 Payment Processing**: Process payments and transactions
 - **📊 Transaction Tracking**: Monitor payments and card activity
 - **🛡️ Security**: All API endpoints protected with authentication
-- **🗄️ Database**: SQLAlchemy ORM with SQLite
+- **🗄️ Database**: SQLAlchemy ORM with PostgreSQL (Supabase)
 - **✅ Validation**: Pydantic models for type-safe requests/responses
+- **🚀 CI/CD**: GitHub Actions for automated testing
 
 ## Project Structure
 
@@ -54,9 +57,23 @@ pip install -r requirements.txt
 Your `.env` file is already set up with:
 ```
 LITHIC_API_KEY=6bca783a-f161-41a5-b20b-6ec40eed92a8
+LITHIC_API_BASE_URL=https://sandbox.lithic.com
 JWT_SECRET_KEY=your-super-secret-jwt-key-change-this-in-production-123456789
+JWT_ALGORITHM=HS256
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
+
+If you want to use Supabase/PostgreSQL instead of local SQLite, add a `DATABASE_URL` value:
+```
+DATABASE_URL=postgresql://postgres:<YOUR-PASSWORD>@db.raomhogdritoqzxghngh.supabase.co:5432/postgres
+```
+
+If your environment does not support direct IPv4 access, use the Supabase pooler host instead:
+```
+DATABASE_URL=postgresql://postgres:<YOUR-PASSWORD>@aws-1-us-west-1.pooler.supabase.com:5432/postgres
+```
+
+> Make sure you replace `<YOUR-PASSWORD>` with your actual Supabase database password.
 
 ### 4. Run the Application
 ```bash

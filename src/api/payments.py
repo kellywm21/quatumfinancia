@@ -28,18 +28,6 @@ def create_payment(
     db.commit()
     db.refresh(db_payment)
     return db_payment
-    transaction_id = str(uuid.uuid4())
-    db_payment = Payment(
-        transaction_id=transaction_id,
-        amount=payment.amount,
-        currency=payment.currency,
-        description=payment.description,
-        status="pending"
-    )
-    db.add(db_payment)
-    db.commit()
-    db.refresh(db_payment)
-    return db_payment
 
 @router.get("/{transaction_id}", response_model=PaymentResponse)
 def get_payment(transaction_id: str, db: Session = Depends(get_db)):

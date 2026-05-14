@@ -4,8 +4,9 @@ from src.config import settings
 from src.database import Base, engine
 from src.api import payments, cards, cardholders, auth
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
+# Create database tables only if not in test environment
+if not settings.debug or "pytest" not in __import__("sys").argv[0]:
+    Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.app_name,
