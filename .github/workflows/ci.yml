@@ -62,3 +62,4 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
           LITHIC_API_KEY: dummy
           JWT_SECRET_KEY: dummy
+          EMAIL_TEST_MODE: true
