@@ -54,13 +54,20 @@ pip install -r requirements.txt
 ```
 
 ### 3. Configure Environment
-Your `.env` file is already set up with:
+Copy the sample environment file into `.env` and update values for your local setup:
+
+```bash
+cp .env.example .env
 ```
-LITHIC_API_KEY=6bca783a-f161-41a5-b20b-6ec40eed92a8
+
+The `.env.example` file includes placeholder values for:
+```
+LITHIC_API_KEY=your_lithic_api_key_here
 LITHIC_API_BASE_URL=https://sandbox.lithic.com
-JWT_SECRET_KEY=your-super-secret-jwt-key-change-this-in-production-123456789
+JWT_SECRET_KEY=your_jwt_secret_here
 JWT_ALGORITHM=HS256
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
+EMAIL_TEST_MODE=true
 ```
 
 If you want to use Supabase/PostgreSQL instead of local SQLite, add a `DATABASE_URL` value:
