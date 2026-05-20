@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Approvals - Advancia Payledger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .nav {
+            background: #34495e;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #2980b9;
+        }
+
+        .nav-badge {
+            display: inline-block;
+            min-width: 22px;
+            padding: 2px 8px;
+            margin-left: 8px;
+            border-radius: 999px;
+            background: #e74c3c;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .approval-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .approval-info {
+            flex: 1;
+        }
+
+        .approval-type {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .approval-details {
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .eta-info {
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-approve {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #218838;
+        }
+
+        .btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #c82333;
+        }
+
+        .btn-view {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #138496;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            padding: 40px;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .qr-code {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .qr-code img {
+            max-width: 200px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .deposit-address {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #5a6268;
+        }
+
+        .pin-input {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .pin-input input {
+            font-size: 2rem;
+            text-align: center;
+            width: 200px;
+            padding: 10px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .nav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .approval-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Advancia Payledger</h1>
+            <p>Pending Approvals Dashboard</p>
+        </div>
+
+        <div class="nav">
+            <a href="wallet_dashboard.html" class="nav-btn">Wallet Dashboard</a>
+            <a href="admin_panel.html" class="nav-btn">Admin Panel</a>
+            <a href="notifications.html" class="nav-btn" id="notifications-link">Notifications<span id="notifications-badge" class="nav-badge hidden">0</span></a>
+            <a href="user_dashboard.html" class="nav-btn">User Dashboard</a>
+            <a href="deposit_address.html" class="nav-btn">Deposit Address</a>
+            <a href="transaction_pin.html" class="nav-btn">Transaction PIN</a>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>Pending Approvals</h2>
+                <div id="approvals-list" class="loading">
+                    Loading pending approvals...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Approval Modal -->
+    <div id="approval-modal" class="modal">
+        <div class="modal-content">
+            <h3>Approval Details</h3>
+            <div id="approval-details">
+                <p>Your request is being processed. Please check back later.</p>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-view" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deposit Address Modal -->
+    <div id="deposit-modal" class="modal">
+        <div class="modal-content">
+            <h3>Deposit Address</h3>
+            <div id="deposit-content">
+                <div class="qr-code">
+                    <img id="qr-code-img" src="" alt="QR Code">
+                </div>
+                <div class="deposit-address">
+                    <strong>Address:</strong><br>
+                    <span id="deposit-address-text"></span>
+                    <button class="copy-btn" onclick="copyAddress()">Copy</button>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-view" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction PIN Modal -->
+    <div id="pin-modal" class="modal">
+        <div class="modal-content">
+            <h3>Enter Transaction PIN</h3>
+            <div class="pin-input">
+                <input type="password" id="pin-input" maxlength="6" placeholder="Enter PIN">
+            </div>
+            <div id="pin-error" style="color: red; text-align: center; margin: 10px 0;"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-reject" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-approve" onclick="verifyPin()">Verify</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentApprovalId = null;
+        let currentPinCallback = null;
+
+        // Load pending approvals
+        async function loadApprovals() {
+            try {
+                const response = await fetch('/auth/pending-approvals', {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (!response.ok) throw new Error('Failed to load approvals');
+
+                const approvals = await response.json();
+                displayApprovals(approvals);
+            } catch (error) {
+                console.error('Error loading approvals:', error);
+                document.getElementById('approvals-list').innerHTML =
+                    '<div class="empty-state"><h3>Error loading approvals</h3><p>Please try again later.</p></div>';
+            }
+        }
+
+        function displayApprovals(approvals) {
+            const container = document.getElementById('approvals-list');
+
+            if (approvals.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No pending approvals</h3><p>All your requests have been processed.</p></div>';
+                return;
+            }
+
+            container.innerHTML = approvals.map(approval => {
+                let statusText = approval.status;
+                let etaText = '';
+                
+                if (approval.approval_type === 'kyc_verification') {
+                    statusText = 'Under Review';
+                    etaText = 'Expected completion: 1-2 business days';
+                } else if (approval.approval_type === 'withdrawal_request') {
+                    statusText = 'Processing';
+                    etaText = approval.amount && approval.amount < 500 ? 'Auto-approved within 24 hours' : 'Manual review within 24 hours';
+                }
+                
+                return `
+                <div class="approval-card">
+                    <div class="approval-info">
+                        <div class="approval-type">${approval.approval_type.replace('_', ' ').toUpperCase()}</div>
+                        <div class="approval-details">
+                            ${approval.amount ? `Amount: $${approval.amount}<br>` : ''}
+                            Requested: ${new Date(approval.created_at).toLocaleString()}<br>
+                            ${etaText}
+                        </div>
+                        <div class="status-badge status-${approval.status}">${statusText}</div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function viewApproval(approvalId) {
+            currentApprovalId = approvalId;
+            document.getElementById('approval-details').innerHTML = `
+                <p>Your request is being reviewed by our team. You will receive an email notification once it's processed.</p>
+            `;
+            document.getElementById('approval-modal').style.display = 'block';
+        }
+
+        function approveApproval() {
+            // Not applicable for user view
+        }
+
+        function rejectApproval() {
+            // Not applicable for user view
+        }
+
+        function closeModal() {
+            document.getElementById('approval-modal').style.display = 'none';
+            document.getElementById('deposit-modal').style.display = 'none';
+            document.getElementById('pin-modal').style.display = 'none';
+            currentApprovalId = null;
+            currentPinCallback = null;
+        }
+
+        function showDepositAddress(address, qrCodeUrl) {
+            document.getElementById('deposit-address-text').textContent = address;
+            document.getElementById('qr-code-img').src = qrCodeUrl;
+            document.getElementById('deposit-modal').style.display = 'block';
+        }
+
+        function copyAddress() {
+            const address = document.getElementById('deposit-address-text').textContent;
+            navigator.clipboard.writeText(address).then(() => {
+                alert('Address copied to clipboard!');
+            });
+        }
+
+        function showPinModal(callback) {
+            currentPinCallback = callback;
+            document.getElementById('pin-input').value = '';
+            document.getElementById('pin-error').textContent = '';
+            document.getElementById('pin-modal').style.display = 'block';
+            document.getElementById('pin-input').focus();
+        }
+
+        async function verifyPin() {
+            const pin = document.getElementById('pin-input').value;
+            if (!pin || pin.length < 4) {
+                document.getElementById('pin-error').textContent = 'Please enter a valid PIN';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/transaction-pin/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(localStorage.getItem('token') ? { Authorization: `Bearer ${localStorage.getItem('token')}` } : {})
+                    },
+                    body: JSON.stringify({ pin })
+                });
+
+                if (response.ok) {
+                    closeModal();
+                    if (currentPinCallback) currentPinCallback();
+                } else {
+                    const error = await response.json();
+                    document.getElementById('pin-error').textContent = error.detail;
+                }
+            } catch (error) {
+                document.getElementById('pin-error').textContent = 'Error verifying PIN';
+            }
+        }
+
+        // Load approvals and notification count on page load
+        loadNotificationCount();
+        loadApprovals();
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let modal of modals) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

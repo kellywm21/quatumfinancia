@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Advancia Payledger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-google {
+            background: #db4437;
+            color: white;
+        }
+
+        .btn-google:hover {
+            background: #c23321;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 10px;
+            color: #7f8c8d;
+        }
+
+        .links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .links a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .success {
+            color: #27ae60;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Advancia Payledger</h1>
+            <p>Create Account</p>
+        </div>
+
+        <form id="register-form">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="full_name">Full Name</label>
+                <input type="text" id="full_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone_number">Phone Number (for 2FA)</label>
+                <input type="tel" id="phone_number" placeholder="+1 (555) 123-4567">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+
+        <div class="divider">
+            <span>or</span>
+        </div>
+
+        <button id="google-signin" class="btn btn-google">
+            Sign up with Google
+        </button>
+
+        <div class="links">
+            <a href="login.html">Already have an account? Login</a>
+        </div>
+
+        <div id="error-message" class="error" style="display: none;"></div>
+        <div id="success-message" class="success" style="display: none;"></div>
+    </div>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        const API_BASE = '/auth';
+
+        // Initialize Google Sign-In
+        window.onload = function() {
+            google.accounts.id.initialize({
+                client_id: '309765497606-ub6ion23nh6id0p60aqtdinjnit33pse.apps.googleusercontent.com',
+                callback: handleGoogleCredential
+            });
+
+            google.accounts.id.renderButton(
+                document.getElementById('google-signin'),
+                { theme: 'outline', size: 'large', text: 'signup_with' }
+            );
+        };
+
+        // Handle Google credential response
+        async function handleGoogleCredential(response) {
+            try {
+                const res = await fetch(`${API_BASE}/google`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: response.credential })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem('token', data.access_token);
+                    window.location.href = 'wallet_dashboard.html';
+                } else {
+                    const error = await res.json();
+                    showError(error.detail || 'Google registration failed');
+                }
+            } catch (error) {
+                showError('Network error during Google registration');
+            }
+        }
+
+        // Handle traditional registration
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const username = document.getElementById('username').value;
+            const full_name = document.getElementById('full_name').value;
+            const phone_number = document.getElementById('phone_number').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        username: username,
+                        full_name: full_name,
+                        phone_number: phone_number,
+                        password: password
+                    })
+                });
+
+                if (response.ok) {
+                    showSuccess('Registration successful! Please check your email to verify your account.');
+                    setTimeout(() => {
+                        window.location.href = 'verify-email.html';
+                    }, 2000);
+                } else {
+                    const error = await response.json();
+                    showError(error.detail || 'Registration failed');
+                }
+            } catch (error) {
+                showError('Network error during registration');
+            }
+        });
+
+        function showError(message) {
+            document.getElementById('error-message').textContent = message;
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            document.getElementById('success-message').textContent = message;
+            document.getElementById('success-message').style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

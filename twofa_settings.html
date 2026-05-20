@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2FA Settings - PayLedger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            margin: 20px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 4px solid #28a745;
+        }
+
+        .status-card.disabled {
+            border-left-color: #dc3545;
+        }
+
+        .status-card h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .status-card p {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-enabled {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-disabled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 2px solid #e9ecef;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading {
+            text-align: center;
+            color: #6c757d;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Two-Factor Authentication</h1>
+            <p>Secure your account with SMS verification</p>
+        </div>
+
+        <div class="content">
+            <div id="status-card" class="status-card">
+                <div class="loading">Loading 2FA status...</div>
+            </div>
+
+            <div id="enable-section" class="form-section hidden">
+                <h3>Enable 2FA</h3>
+                <form id="enable-form">
+                    <div class="form-group">
+                        <label for="phone_number">Phone Number</label>
+                        <input type="tel" id="phone_number" placeholder="+1234567890" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send Verification Code</button>
+                </form>
+            </div>
+
+            <div id="verify-section" class="form-section hidden">
+                <h3>Verify Your Phone</h3>
+                <form id="verify-form">
+                    <div class="form-group">
+                        <label for="otp">Enter 6-digit code</label>
+                        <input type="text" id="otp" placeholder="000000" maxlength="6" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Verify & Enable 2FA</button>
+                    <button type="button" class="btn btn-secondary" onclick="cancelVerification()">Cancel</button>
+                </form>
+            </div>
+
+            <div id="disable-section" class="form-section hidden">
+                <h3>Disable 2FA</h3>
+                <p>Disabling 2FA will remove SMS verification from your account.</p>
+                <button class="btn btn-danger" onclick="disable2FA()">Disable 2FA</button>
+            </div>
+
+            <button class="btn btn-secondary" onclick="window.location.href='/wallet_dashboard.html'">Back to Dashboard</button>
+
+            <div id="message"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentStatus = null;
+        const token = localStorage.getItem('token');
+
+        async function load2FAStatus() {
+            try {
+                const response = await fetch('/api/2fa/status', {
+                    headers: {
+                        ...(token ? { Authorization: `Bearer ${token}` } : {})
+                    }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    currentStatus = data;
+                    displayStatus(data);
+                } else {
+                    showMessage('Failed to load 2FA status', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error', 'error');
+            }
+        }
+
+        function displayStatus(data) {
+            const statusCard = document.getElementById('status-card');
+            const badgeClass = data.enabled ? 'status-enabled' : 'status-disabled';
+            const statusText = data.enabled ? 'Enabled' : 'Disabled';
+
+            statusCard.className = `status-card ${data.enabled ? '' : 'disabled'}`;
+            statusCard.innerHTML = `
+                <h3>2FA Status</h3>
+                <p>Two-factor authentication is currently <strong>${statusText.toLowerCase()}</strong>.</p>
+                <span class="status-badge ${badgeClass}">${statusText}</span>
+                ${data.phone_number ? `<p>Phone: ${data.phone_number}</p>` : ''}
+            `;
+
+            // Show appropriate sections
+            document.getElementById('enable-section').classList.toggle('hidden', data.enabled);
+            document.getElementById('disable-section').classList.toggle('hidden', !data.enabled);
+            document.getElementById('verify-section').classList.add('hidden');
+        }
+
+        document.getElementById('enable-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const phoneNumber = document.getElementById('phone_number').value;
+
+            try {
+                const response = await fetch('/api/2fa/enable', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {})
+                    },
+                    body: JSON.stringify({
+                        phone_number: phoneNumber
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showMessage(data.message, 'info');
+                    document.getElementById('enable-section').classList.add('hidden');
+                    document.getElementById('verify-section').classList.remove('hidden');
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || 'Failed to enable 2FA', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error', 'error');
+            }
+        });
+
+        document.getElementById('verify-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const otp = document.getElementById('otp').value;
+
+            try {
+                const response = await fetch('/api/2fa/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {})
+                    },
+                    body: JSON.stringify({
+                        code: otp
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showMessage(data.message, 'success');
+                    load2FAStatus(); // Refresh status
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || 'Verification failed', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error', 'error');
+            }
+        });
+
+        async function disable2FA() {
+            if (!confirm('Are you sure you want to disable 2FA? This will make your account less secure.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/2fa/disable', {
+                    method: 'POST',
+                    headers: {
+                        ...(token ? { Authorization: `Bearer ${token}` } : {})
+                    }
+                });
+
+                if (response.ok) {
+                    showMessage('2FA has been disabled', 'success');
+                    load2FAStatus(); // Refresh status
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || 'Failed to disable 2FA', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error', 'error');
+            }
+        }
+
+        function cancelVerification() {
+            document.getElementById('verify-section').classList.add('hidden');
+            document.getElementById('enable-section').classList.remove('hidden');
+            document.getElementById('otp').value = '';
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+        }
+
+        // Load status on page load
+        load2FAStatus();
+    </script>
+</body>
+</html>

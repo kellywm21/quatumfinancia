@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Crypto - PayLedger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            margin: 20px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 2px solid #e9ecef;
+        }
+
+        .rates-display {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e9ecef;
+        }
+
+        .rate-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .rate-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .crypto-amount {
+            font-size: 18px;
+            font-weight: 600;
+            color: #28a745;
+            margin-top: 10px;
+        }
+
+        .error {
+            color: #dc3545;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8d7da;
+            border-radius: 6px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success {
+            color: #155724;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #d4edda;
+            border-radius: 6px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .loading {
+            text-align: center;
+            color: #6c757d;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Buy Crypto</h1>
+            <p>Purchase cryptocurrency with fiat currency</p>
+        </div>
+
+        <div class="form-container">
+            <div id="rates-container">
+                <div class="rates-display">
+                    <h3>Current Rates (USD)</h3>
+                    <div id="rates-list">
+                        <div class="loading">Loading rates...</div>
+                    </div>
+                </div>
+            </div>
+
+            <form id="purchase-form">
+                <div class="form-group">
+                    <label for="currency">Cryptocurrency</label>
+                    <select id="currency" required>
+                        <option value="">Select Currency</option>
+                        <option value="BTC">Bitcoin (BTC)</option>
+                        <option value="ETH">Ethereum (ETH)</option>
+                        <option value="USDC">USD Coin (USDC)</option>
+                        <option value="USDT">Tether (USDT)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Amount (USD)</label>
+                    <input type="number" id="amount" min="10" max="10000" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="payment_method">Payment Method</label>
+                    <select id="payment_method" required>
+                        <option value="">Select Payment Method</option>
+                        <option value="credit_card">Credit Card</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                    </select>
+                </div>
+
+                <div id="crypto-amount" class="crypto-amount" style="display: none;"></div>
+
+                <button type="submit" class="btn btn-primary">Purchase Crypto</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='/wallet_dashboard.html'">Back to Dashboard</button>
+            </form>
+
+            <div id="message"></div>
+        </div>
+    </div>
+
+    <script>
+        let rates = {};
+
+        const getAuthHeaders = () => {
+            const token = localStorage.getItem('token');
+            return token ? { Authorization: `Bearer ${token}` } : {};
+        };
+
+        async function loadRates() {
+            try {
+                const response = await fetch('/api/fiat/rates', {
+                    headers: getAuthHeaders()
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    rates = data.rates;
+                    displayRates(data.rates);
+                }
+            } catch (error) {
+                console.error('Error loading rates:', error);
+            }
+        }
+
+        function displayRates(rates) {
+            const ratesList = document.getElementById('rates-list');
+            ratesList.innerHTML = Object.entries(rates).map(([currency, rate]) => `
+                <div class="rate-item">
+                    <span>${currency}</span>
+                    <span>$${rate.toFixed(2)}</span>
+                </div>
+            `).join('');
+        }
+
+        function calculateCryptoAmount() {
+            const currency = document.getElementById('currency').value;
+            const amount = parseFloat(document.getElementById('amount').value) || 0;
+
+            if (currency && amount > 0 && rates[currency]) {
+                const cryptoAmount = amount / rates[currency];
+                document.getElementById('crypto-amount').style.display = 'block';
+                document.getElementById('crypto-amount').textContent =
+                    `You will receive: ${cryptoAmount.toFixed(8)} ${currency}`;
+            } else {
+                document.getElementById('crypto-amount').style.display = 'none';
+            }
+        }
+
+        document.getElementById('currency').addEventListener('change', calculateCryptoAmount);
+        document.getElementById('amount').addEventListener('input', calculateCryptoAmount);
+
+        document.getElementById('purchase-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const currency = document.getElementById('currency').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const paymentMethod = document.getElementById('payment_method').value;
+
+            if (!currency || !amount || !paymentMethod) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (amount < 10) {
+                showMessage('Minimum purchase amount is $10', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/fiat/purchase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(localStorage.getItem('token') ? { Authorization: `Bearer ${localStorage.getItem('token')}` } : {})
+                    },
+                    body: JSON.stringify({
+                        currency: currency,
+                        amount: amount,
+                        payment_method: paymentMethod
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showMessage(`Purchase initiated! You will receive ${data.amount} ${data.currency}. Payment URL: ${data.payment_url}`, 'success');
+
+                    // Redirect to payment URL if available
+                    if (data.payment_url) {
+                        setTimeout(() => {
+                            window.open(data.payment_url, '_blank');
+                        }, 2000);
+                    }
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || 'Purchase failed', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Please try again.', 'error');
+            }
+        });
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = type;
+            messageDiv.textContent = text;
+        }
+
+        // Load rates on page load
+        loadRates();
+    </script>
+</body>
+</html>

@@ -46,15 +46,28 @@ def create_cardholder(
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/{account_token}", response_model=CardholderResponse)
-def get_cardholder(account_token: str, db: Session = Depends(get_db)):
+def get_cardholder(
+    account_token: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
     """Get cardholder details"""
     cardholder = db.query(Cardholder).filter(Cardholder.account_token == account_token).first()
     if not cardholder:
         raise HTTPException(status_code=404, detail="Cardholder not found")
+    if not current_user.is_admin and cardholder.email != current_user.email:
+        raise HTTPException(status_code=403, detail="Not authorized to view this cardholder")
     return cardholder
 
 @router.get("/")
-def list_cardholders(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+def list_cardholders(
+    skip: int = 0,
+    limit: int = 10,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
     """List all cardholders"""
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not authorized to list cardholders")
     cardholders = db.query(Cardholder).offset(skip).limit(limit).all()
     return cardholders

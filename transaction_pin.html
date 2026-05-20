@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction PIN - Advancia Payledger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .nav {
+            background: #34495e;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #2980b9;
+        }
+
+        .nav-badge {
+            display: inline-block;
+            min-width: 22px;
+            padding: 2px 8px;
+            margin-left: 8px;
+            border-radius: 999px;
+            background: #e74c3c;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .pin-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .pin-input-group {
+            margin: 30px 0;
+        }
+
+        .pin-input {
+            font-size: 2.5rem;
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            background: white;
+            font-family: monospace;
+            letter-spacing: 0.5rem;
+        }
+
+        .pin-input:focus {
+            outline: none;
+            border-color: #2980b9;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .pin-dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .pin-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #dee2e6;
+            transition: background 0.3s;
+        }
+
+        .pin-dot.active {
+            background: #3498db;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .error-message {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .success-message {
+            color: #155724;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .info-message {
+            color: #0c5460;
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .pin-status {
+            margin: 20px 0;
+            padding: 15px;
+            background: #e7f3ff;
+            border: 1px solid #b3d7ff;
+            border-radius: 6px;
+        }
+
+        .pin-status h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .pin-status p {
+            color: #495057;
+            margin: 5px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-row input {
+            flex: 1;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .nav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .pin-input {
+                font-size: 2rem;
+                max-width: 250px;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Advancia Payledger</h1>
+            <p>Transaction PIN Management</p>
+        </div>
+
+        <div class="nav">
+            <a href="wallet_dashboard.html" class="nav-btn">Wallet Dashboard</a>
+            <a href="admin_panel.html" class="nav-btn">Admin Panel</a>
+            <a href="pending_approvals.html" class="nav-btn">Pending Approvals</a>
+            <a href="notifications.html" class="nav-btn" id="notifications-link">Notifications<span id="notifications-badge" class="nav-badge hidden">0</span></a>
+            <a href="deposit_address.html" class="nav-btn">Deposit Address</a>
+            <a href="user_dashboard.html" class="nav-btn">User Dashboard</a>
+        </div>
+
+        <div class="content">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('verify')">Verify PIN</button>
+                <button class="tab" onclick="switchTab('set')">Set PIN</button>
+                <button class="tab" onclick="switchTab('change')">Change PIN</button>
+                <button class="tab" onclick="switchTab('status')">PIN Status</button>
+            </div>
+
+            <!-- Verify PIN Tab -->
+            <div id="verify-tab" class="tab-content active">
+                <div class="section">
+                    <h2>Verify Transaction PIN</h2>
+                    <div class="pin-card">
+                        <p>Enter your 4-6 digit transaction PIN to verify access.</p>
+
+                        <div class="pin-input-group">
+                            <input type="password" id="verify-pin-input" class="pin-input" maxlength="6" placeholder="••••••" oninput="updateDots('verify')">
+                            <div class="pin-dots" id="verify-dots">
+                                <div class="pin-dot"></div>
+                                <div class="pin-dot"></div>
+                                <div class="pin-dot"></div>
+                                <div class="pin-dot"></div>
+                                <div class="pin-dot"></div>
+                                <div class="pin-dot"></div>
+                            </div>
+                        </div>
+
+                        <div id="verify-error" class="error-message" style="display: none;"></div>
+                        <div id="verify-success" class="success-message" style="display: none;"></div>
+
+                        <button class="btn btn-primary" onclick="verifyPin()">Verify PIN</button>
+                        <button class="btn btn-secondary" onclick="clearPin('verify')">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Set PIN Tab -->
+            <div id="set-tab" class="tab-content">
+                <div class="section">
+                    <h2>Set Transaction PIN</h2>
+                    <div class="pin-card">
+                        <p>Create a new 4-6 digit transaction PIN for secure transactions.</p>
+
+                        <div class="pin-input-group">
+                            <input type="password" id="set-pin-input" class="pin-input" maxlength="6" placeholder="••••••" oninput="updateDots('set')">
+                            <div class="pin-dots" id="set-dots">
+                                <div class="pin-dot"></div>
+                                <div class="pin-dot"></div>
+                                <div class="pin-dot"></div>
+                                <div class="pin-dot"></div>
+                                <div class="pin-dot"></div>
+                                <div class="pin-dot"></div>
+                            </div>
+                        </div>
+
+                        <div id="set-error" class="error-message" style="display: none;"></div>
+                        <div id="set-success" class="success-message" style="display: none;"></div>
+
+                        <button class="btn btn-success" onclick="setPin()">Set PIN</button>
+                        <button class="btn btn-secondary" onclick="clearPin('set')">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Change PIN Tab -->
+            <div id="change-tab" class="tab-content">
+                <div class="section">
+                    <h2>Change Transaction PIN</h2>
+                    <div class="pin-card">
+                        <p>Enter your current PIN and set a new one.</p>
+
+                        <div class="form-group">
+                            <label>Current PIN:</label>
+                            <input type="password" id="current-pin-input" class="pin-input" maxlength="6" placeholder="••••••">
+                        </div>
+
+                        <div class="form-group">
+                            <label>New PIN:</label>
+                            <input type="password" id="new-pin-input" class="pin-input" maxlength="6" placeholder="••••••">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Confirm New PIN:</label>
+                            <input type="password" id="confirm-pin-input" class="pin-input" maxlength="6" placeholder="••••••">
+                        </div>
+
+                        <div id="change-error" class="error-message" style="display: none;"></div>
+                        <div id="change-success" class="success-message" style="display: none;"></div>
+
+                        <button class="btn btn-success" onclick="changePin()">Change PIN</button>
+                        <button class="btn btn-secondary" onclick="clearPin('change')">Clear All</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PIN Status Tab -->
+            <div id="status-tab" class="tab-content">
+                <div class="section">
+                    <h2>PIN Status</h2>
+                    <div id="status-loading" class="loading">Loading PIN status...</div>
+                    <div id="status-content" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+
+        const getAuthHeaders = (json = false) => {
+            const headers = {};
+            if (json) headers['Content-Type'] = 'application/json';
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            return headers;
+        };
+
+        async function loadNotificationCount() {
+            try {
+                const response = await fetch('/api/notifications/user/unread-count', {
+                    headers: getAuthHeaders()
+                });
+                if (!response.ok) return;
+
+                const data = await response.json();
+                const badge = document.getElementById('notifications-badge');
+                if (!badge) return;
+
+                if (data.unread_count > 0) {
+                    badge.textContent = data.unread_count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading notification count:', error);
+            }
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+
+            // Load status if status tab is selected
+            if (tabName === 'status') {
+                loadPinStatus();
+            }
+        }
+
+        function updateDots(prefix) {
+            const input = document.getElementById(prefix + '-pin-input');
+            const dots = document.getElementById(prefix + '-dots').children;
+            const length = input.value.length;
+
+            for (let i = 0; i < dots.length; i++) {
+                if (i < length) {
+                    dots[i].classList.add('active');
+                } else {
+                    dots[i].classList.remove('active');
+                }
+            }
+        }
+
+        function clearPin(prefix) {
+            if (prefix === 'change') {
+                document.getElementById('current-pin-input').value = '';
+                document.getElementById('new-pin-input').value = '';
+                document.getElementById('confirm-pin-input').value = '';
+            } else {
+                document.getElementById(prefix + '-pin-input').value = '';
+                updateDots(prefix);
+            }
+
+            // Clear messages
+            hideMessages();
+        }
+
+        function hideMessages() {
+            document.querySelectorAll('.error-message, .success-message').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+
+        async function verifyPin() {
+            const pin = document.getElementById('verify-pin-input').value;
+            const errorDiv = document.getElementById('verify-error');
+            const successDiv = document.getElementById('verify-success');
+
+            hideMessages();
+
+            if (!pin || pin.length < 4) {
+                errorDiv.textContent = 'Please enter a valid PIN (4-6 digits)';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/transaction-pin/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {})
+                    },
+                    body: JSON.stringify({ pin })
+                });
+
+                if (response.ok) {
+                    successDiv.textContent = 'PIN verified successfully!';
+                    successDiv.style.display = 'block';
+                    clearPin('verify');
+                } else {
+                    const error = await response.json();
+                    errorDiv.textContent = error.detail;
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error verifying PIN. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        async function setPin() {
+            const pin = document.getElementById('set-pin-input').value;
+            const errorDiv = document.getElementById('set-error');
+            const successDiv = document.getElementById('set-success');
+
+            hideMessages();
+
+            if (!pin || pin.length < 4) {
+                errorDiv.textContent = 'Please enter a valid PIN (4-6 digits)';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/transaction-pin/set', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {})
+                    },
+                    body: JSON.stringify({ pin })
+                });
+
+                if (response.ok) {
+                    successDiv.textContent = 'PIN set successfully!';
+                    successDiv.style.display = 'block';
+                    clearPin('set');
+                } else {
+                    const error = await response.json();
+                    errorDiv.textContent = error.detail;
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error setting PIN. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        async function changePin() {
+            const currentPin = document.getElementById('current-pin-input').value;
+            const newPin = document.getElementById('new-pin-input').value;
+            const confirmPin = document.getElementById('confirm-pin-input').value;
+            const errorDiv = document.getElementById('change-error');
+            const successDiv = document.getElementById('change-success');
+
+            hideMessages();
+
+            if (!currentPin || !newPin || !confirmPin) {
+                errorDiv.textContent = 'Please fill in all fields';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            if (newPin !== confirmPin) {
+                errorDiv.textContent = 'New PIN and confirmation do not match';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            if (newPin.length < 4) {
+                errorDiv.textContent = 'New PIN must be at least 4 digits';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/transaction-pin/change', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {})
+                    },
+                    body: JSON.stringify({ pin: newPin })
+                });
+
+                if (response.ok) {
+                    successDiv.textContent = 'PIN changed successfully!';
+                    successDiv.style.display = 'block';
+                    clearPin('change');
+                } else {
+                    const error = await response.json();
+                    errorDiv.textContent = error.detail;
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error changing PIN. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        async function loadPinStatus() {
+            const loading = document.getElementById('status-loading');
+            const content = document.getElementById('status-content');
+
+            loading.style.display = 'block';
+            content.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/transaction-pin/status', {
+                    headers: {
+                        ...(token ? { Authorization: `Bearer ${token}` } : {})
+                    }
+                });
+                if (!response.ok) throw new Error('Failed to load PIN status');
+
+                const status = await response.json();
+
+                content.innerHTML = `
+                    <div class="pin-status">
+                        <h3>Transaction PIN Status</h3>
+                        <p><strong>Status:</strong> ${status.pin_hash ? 'Set' : 'Not Set'}</p>
+                        <p><strong>Failed Attempts:</strong> ${status.failed_attempts || 0}</p>
+                        ${status.locked_until ? `<p><strong>Locked Until:</strong> ${new Date(status.locked_until).toLocaleString()}</p>` : ''}
+                        <p><strong>Last Updated:</strong> ${new Date(status.updated_at || status.created_at).toLocaleString()}</p>
+                    </div>
+                `;
+
+                loading.style.display = 'none';
+                content.style.display = 'block';
+            } catch (error) {
+                content.innerHTML = '<div class="error-message">Error loading PIN status. Please try again.</div>';
+                loading.style.display = 'none';
+                content.style.display = 'block';
+            }
+        }
+
+        // Load status on page load if status tab is active
+        window.addEventListener('load', () => {
+            if (document.getElementById('status-tab').classList.contains('active')) {
+                loadPinStatus();
+            }
+            loadNotificationCount();
+        });
+    </script>
+</body>
+</html>

@@ -30,7 +30,11 @@ def create_payment(
     return db_payment
 
 @router.get("/{transaction_id}", response_model=PaymentResponse)
-def get_payment(transaction_id: str, db: Session = Depends(get_db)):
+def get_payment(
+    transaction_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
     """Get payment details"""
     payment = db.query(Payment).filter(Payment.transaction_id == transaction_id).first()
     if not payment:
@@ -38,7 +42,12 @@ def get_payment(transaction_id: str, db: Session = Depends(get_db)):
     return payment
 
 @router.get("/")
-def list_payments(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+def list_payments(
+    skip: int = 0,
+    limit: int = 10,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
     """List all payments"""
     payments = db.query(Payment).offset(skip).limit(limit).all()
     return payments

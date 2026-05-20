@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Management - Advancia Payledger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .nav {
+            background: #34495e;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #2980b9;
+        }
+
+        .nav-badge {
+            display: inline-block;
+            min-width: 22px;
+            padding: 2px 8px;
+            margin-left: 8px;
+            border-radius: 999px;
+            background: #e74c3c;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .card-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .card-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            font-family: monospace;
+        }
+
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .card-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .card-value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .card-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-frozen {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-expired {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .request-card-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .request-card-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .request-card-section p {
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+
+        .transactions-section {
+            margin-top: 40px;
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .transactions-table th,
+        .transactions-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .transactions-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .tx-amount {
+            font-weight: bold;
+        }
+
+        .tx-positive {
+            color: #28a745;
+        }
+
+        .tx-negative {
+            color: #dc3545;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            padding: 40px;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card-details {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .card-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Advancia Payledger</h1>
+            <p>Card Management</p>
+        </div>
+
+        <div class="nav">
+            <a href="wallet_dashboard.html" class="nav-btn">Wallet Dashboard</a>
+            <a href="pending_approvals.html" class="nav-btn">Pending Approvals</a>
+            <a href="notifications.html" class="nav-btn" id="notifications-link">Notifications<span id="notifications-badge" class="nav-badge hidden">0</span></a>
+            <a href="admin_panel.html" class="nav-btn">Admin Panel</a>
+            <a href="transaction_pin.html" class="nav-btn">Transaction PIN</a>
+        </div>
+
+        <div class="content">
+            <!-- Request Card Section -->
+            <div class="section">
+                <div class="request-card-section">
+                    <h3>Request Virtual Debit Card</h3>
+                    <p>Get instant spending power with crypto-backed virtual cards</p>
+                    <p><strong>Requirements:</strong> Approved KYC, minimum $50 wallet balance</p>
+                    <button class="btn btn-primary" onclick="requestCard()">Request Card</button>
+                </div>
+            </div>
+
+            <!-- My Cards -->
+            <div class="section">
+                <h2>My Cards</h2>
+                <div id="cards-container" class="card-grid">
+                    <div class="loading">Loading cards...</div>
+                </div>
+            </div>
+
+            <!-- Card Transactions -->
+            <div class="section transactions-section">
+                <h2>Card Transactions</h2>
+                <div id="transactions-container">
+                    <div class="loading">Loading transactions...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Card Modal -->
+    <div id="request-modal" class="modal">
+        <div class="modal-content">
+            <h3>Request Virtual Card</h3>
+            <p>Your card will be issued by our partner Lithic and funded from your wallet balance.</p>
+            <div class="form-group">
+                <label for="card-label">Card Label (Optional)</label>
+                <input type="text" id="card-label" placeholder="e.g., Shopping Card, Travel Card">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitCardRequest()">Request Card</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Set PIN Modal -->
+    <div id="pin-modal" class="modal">
+        <div class="modal-content">
+            <h3>Set Card PIN</h3>
+            <p>Create a 4-digit PIN for your card</p>
+            <div class="form-group">
+                <label for="card-pin">PIN</label>
+                <input type="password" id="card-pin" maxlength="4" placeholder="1234">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="setCardPin()">Set PIN</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCardId = null;
+
+        const getAuthHeaders = () => {
+            const token = localStorage.getItem('token');
+            return token ? { Authorization: `Bearer ${token}` } : {};
+        };
+
+        // Load cards on page load
+        window.addEventListener('load', () => {
+            loadCards();
+            loadCardTransactions();
+            loadNotificationCount();
+        });
+
+        async function loadNotificationCount() {
+            try {
+                const response = await fetch('/api/notifications/user/unread-count', {
+                    headers: getAuthHeaders()
+                });
+                if (!response.ok) return;
+
+                const data = await response.json();
+                const badge = document.getElementById('notifications-badge');
+                if (!badge) return;
+
+                if (data.unread_count > 0) {
+                    badge.textContent = data.unread_count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading notification count:', error);
+            }
+        }
+
+        async function loadCards() {
+            try {
+                const response = await fetch('/api/cards/my-cards', {
+                    headers: getAuthHeaders()
+                });
+                if (!response.ok) throw new Error('Failed to load cards');
+
+                const cards = await response.json();
+                displayCards(cards);
+            } catch (error) {
+                console.error('Error loading cards:', error);
+                document.getElementById('cards-container').innerHTML =
+                    '<div class="empty-state"><h3>Error loading cards</h3><p>Please try again later.</p></div>';
+            }
+        }
+
+        function displayCards(cards) {
+            const container = document.getElementById('cards-container');
+
+            if (cards.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No cards found</h3><p>Request your first virtual card to get started.</p></div>';
+                return;
+            }
+
+            container.innerHTML = cards.map(card => `
+                <div class="card-item">
+                    <div class="card-status status-${card.status}">${card.status}</div>
+                    <div class="card-number">•••• •••• •••• ${card.pan || '0000'}</div>
+                    <div class="card-details">
+                        <div class="card-info">
+                            <span class="card-label">Expires</span>
+                            <span class="card-value">${card.exp_month || '--'}/${card.exp_year || '--'}</span>
+                        </div>
+                        <div class="card-info">
+                            <span class="card-label">Balance</span>
+                            <span class="card-value">$${card.available_balance?.toFixed(2) || '0.00'}</span>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-secondary" onclick="viewCardDetails('${card.card_token}')">Details</button>
+                        <button class="btn ${card.status === 'active' ? 'btn-danger' : 'btn-success'}" onclick="toggleCardFreeze('${card.card_token}', '${card.status}')">
+                            ${card.status === 'active' ? 'Freeze' : 'Unfreeze'}
+                        </button>
+                        <button class="btn btn-primary" onclick="setCardPinModal('${card.card_token}')">Set PIN</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadCardTransactions() {
+            try {
+                const response = await fetch('/api/cards/transactions', {
+                    headers: getAuthHeaders()
+                });
+                if (!response.ok) throw new Error('Failed to load transactions');
+
+                const transactions = await response.json();
+                displayCardTransactions(transactions);
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                document.getElementById('transactions-container').innerHTML =
+                    '<div class="empty-state"><h3>Error loading transactions</h3><p>Please try again later.</p></div>';
+            }
+        }
+
+        function displayCardTransactions(transactions) {
+            const container = document.getElementById('transactions-container');
+
+            if (transactions.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>No transactions found</h3><p>Your card transaction history will appear here.</p></div>';
+                return;
+            }
+
+            const tableHTML = `
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${transactions.map(tx => `
+                            <tr>
+                                <td>${new Date(tx.created_at).toLocaleDateString()}</td>
+                                <td>${tx.description || 'Card Transaction'}</td>
+                                <td class="tx-amount tx-negative">-$${tx.amount?.toFixed(2) || '0.00'}</td>
+                                <td>${tx.status}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = tableHTML;
+        }
+
+        function requestCard() {
+            document.getElementById('request-modal').style.display = 'block';
+        }
+
+        async function submitCardRequest() {
+            const label = document.getElementById('card-label').value;
+
+            try {
+                const response = await fetch('/api/cards/request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...getAuthHeaders()
+                    },
+                    body: JSON.stringify({ memo: label })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to request card');
+                }
+
+                alert('Card request submitted! You will be notified once approved.');
+                closeModal();
+                loadCards();
+            } catch (error) {
+                alert('Error requesting card: ' + error.message);
+            }
+        }
+
+        function setCardPinModal(cardId) {
+            currentCardId = cardId;
+            document.getElementById('pin-modal').style.display = 'block';
+        }
+
+        async function setCardPin() {
+            const pin = document.getElementById('card-pin').value;
+
+            if (!pin || pin.length !== 4) {
+                alert('Please enter a valid 4-digit PIN');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/cards/${currentCardId}/set-pin`, {
+                    method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...getAuthHeaders()
+                },
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to set PIN');
+                }
+
+                alert('PIN set successfully!');
+                closeModal();
+            } catch (error) {
+                alert('Error setting PIN: ' + error.message);
+            }
+        }
+
+        async function toggleCardFreeze(cardId, currentStatus) {
+            const action = currentStatus === 'active' ? 'freeze' : 'unfreeze';
+
+            try {
+                const response = await fetch(`/api/cards/${cardId}/${action}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || `Failed to ${action} card`);
+                }
+
+                loadCards();
+            } catch (error) {
+                alert(`Error ${action}ing card: ` + error.message);
+            }
+        }
+
+        function viewCardDetails(cardId) {
+            // In a real implementation, this would show full card details
+            alert('Card details view - Full card number would be shown securely here');
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            currentCardId = null;
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

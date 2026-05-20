@@ -40,9 +40,24 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+      - name: Check PostgreSQL connection
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+        run: |
+          python - <<'PY'
+          import os
+          from sqlalchemy import create_engine
+
+          url = os.environ['DATABASE_URL']
+          print('DATABASE_URL:', url)
+          engine = create_engine(url)
+          with engine.connect() as conn:
+              result = conn.execute('SELECT 1')
+              print('DB connection successful:', result.scalar())
+          PY
       - name: Run tests
         run: |
-          python -m pytest
+          python -m pytest -vv
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
           LITHIC_API_KEY: dummy

@@ -1,9 +1,9 @@
-# Advancia Payledger - Payment Processing API with Authentication
+# Advancia Payledger - Smart Wallet & Payroll Platform
 
-[![CI](https://github.com/advanciahealthcare-ops/advancia-payledger/actions/workflows/ci.yml/badge.svg)](https://github.com/advanciahealthcare-ops/advancia-payledger/actions/workflows/ci.yml)
+[![CI](https://github.com/advanciapayroll-ops/advancia-payledger/actions/workflows/ci.yml/badge.svg)](https://github.com/advanciapayroll-ops/advancia-payledger/actions/workflows/ci.yml)
 
-A FastAPI-based payment processing platform with Lithic card issuance
-integration and JWT authentication.
+A comprehensive FastAPI-based digital wallet and payroll platform with
+gasless transactions, non-custodial crypto wallets, and instant virtual card issuance.
 
 ## ✨ Features
 

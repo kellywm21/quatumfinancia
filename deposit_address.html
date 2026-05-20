@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit Address - Advancia Payledger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .nav {
+            background: #34495e;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #2980b9;
+        }
+
+        .nav-badge {
+            display: inline-block;
+            min-width: 22px;
+            padding: 2px 8px;
+            margin-left: 8px;
+            border-radius: 999px;
+            background: #e74c3c;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .deposit-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .qr-code {
+            margin: 20px 0;
+        }
+
+        .qr-code img {
+            max-width: 250px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .deposit-address {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            word-break: break-all;
+            color: #2c3e50;
+        }
+
+        .address-label {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .copy-btn.copied {
+            background: #17a2b8;
+        }
+
+        .currency-selector {
+            margin-bottom: 30px;
+        }
+
+        .currency-selector label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .currency-selector select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: white;
+        }
+
+        .generate-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .generate-btn:hover {
+            background: #2980b9;
+        }
+
+        .generate-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid #c3e6cb;
+        }
+
+        .instructions {
+            background: #e7f3ff;
+            border: 1px solid #b3d7ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .instructions h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .instructions ol {
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            color: #495057;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .nav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .deposit-card {
+                padding: 20px;
+            }
+
+            .qr-code img {
+                max-width: 200px;
+            }
+
+            .deposit-address {
+                font-size: 1rem;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Advancia Payledger</h1>
+            <p>Deposit Address Generator</p>
+        </div>
+
+        <div class="nav">
+            <a href="wallet_dashboard.html" class="nav-btn">Wallet Dashboard</a>
+            <a href="admin_panel.html" class="nav-btn">Admin Panel</a>
+            <a href="pending_approvals.html" class="nav-btn">Pending Approvals</a>
+            <a href="notifications.html" class="nav-btn" id="notifications-link">Notifications<span id="notifications-badge" class="nav-badge hidden">0</span></a>
+            <a href="user_dashboard.html" class="nav-btn">User Dashboard</a>
+            <a href="transaction_pin.html" class="nav-btn">Transaction PIN</a>
+        </div>
+
+        <div class="content">
+            <div class="instructions">
+                <h3>How to Deposit Funds</h3>
+                <ol>
+                    <li>Select your preferred cryptocurrency</li>
+                    <li>Generate a unique deposit address</li>
+                    <li>Send funds to the displayed address</li>
+                    <li>Funds will be credited after confirmation</li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>Generate Deposit Address</h2>
+
+                <div class="currency-selector">
+                    <label for="currency-select">Select Cryptocurrency:</label>
+                    <select id="currency-select">
+                        <option value="BTC">Bitcoin (BTC)</option>
+                        <option value="ETH">Ethereum (ETH)</option>
+                        <option value="USDT">Tether (USDT)</option>
+                        <option value="USDC">USD Coin (USDC)</option>
+                    </select>
+                </div>
+
+                <button id="generate-btn" class="generate-btn" onclick="generateAddress()">
+                    Generate Deposit Address
+                </button>
+
+                <div id="result-container" style="display: none;">
+                    <div class="deposit-card">
+                        <h3>Deposit Address Generated</h3>
+
+                        <div class="qr-code">
+                            <img id="qr-code-img" src="" alt="QR Code">
+                        </div>
+
+                        <div class="deposit-address">
+                            <span class="address-label">Deposit Address:</span>
+                            <span id="deposit-address-text"></span>
+                        </div>
+
+                        <button id="copy-btn" class="copy-btn" onclick="copyAddress()">
+                            📋 Copy Address
+                        </button>
+                    </div>
+                </div>
+
+                <div id="loading" class="loading" style="display: none;">
+                    Generating deposit address...
+                </div>
+
+                <div id="error-message" class="error" style="display: none;"></div>
+                <div id="success-message" class="success" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAddress = null;
+
+        const getAuthHeaders = (json = false) => {
+            const token = localStorage.getItem('token');
+            const headers = {};
+            if (json) headers['Content-Type'] = 'application/json';
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            return headers;
+        };
+
+        async function loadNotificationCount() {
+            try {
+                const response = await fetch('/api/notifications/user/unread-count', {
+                    headers: getAuthHeaders()
+                });
+                if (!response.ok) return;
+
+                const data = await response.json();
+                const badge = document.getElementById('notifications-badge');
+                if (!badge) return;
+
+                if (data.unread_count > 0) {
+                    badge.textContent = data.unread_count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Error loading notification count:', error);
+            }
+        }
+
+        async function generateAddress() {
+            const currency = document.getElementById('currency-select').value;
+            const generateBtn = document.getElementById('generate-btn');
+            const loading = document.getElementById('loading');
+            const resultContainer = document.getElementById('result-container');
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+
+            // Reset states
+            resultContainer.style.display = 'none';
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            loading.style.display = 'block';
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+
+            try {
+                const response = await fetch('/api/deposits/generate', {
+                    method: 'POST',
+                    headers: getAuthHeaders(true),
+                    body: JSON.stringify({ currency })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to generate address');
+                }
+
+                const data = await response.json();
+                currentAddress = data.address;
+
+                // Update UI
+                document.getElementById('qr-code-img').src = data.qr_code_url;
+                document.getElementById('deposit-address-text').textContent = data.address;
+
+                resultContainer.style.display = 'block';
+                successMessage.textContent = 'Deposit address generated successfully!';
+                successMessage.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error generating address:', error);
+                errorMessage.textContent = error.message;
+                errorMessage.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generate Deposit Address';
+            }
+        }
+
+        function copyAddress() {
+            if (!currentAddress) return;
+
+            navigator.clipboard.writeText(currentAddress).then(() => {
+                const copyBtn = document.getElementById('copy-btn');
+                copyBtn.textContent = '✅ Copied!';
+                copyBtn.classList.add('copied');
+
+                setTimeout(() => {
+                    copyBtn.textContent = '📋 Copy Address';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                alert('Failed to copy address');
+            });
+        }
+
+        // Auto-generate address on page load for BTC
+        window.addEventListener('load', () => {
+            loadNotificationCount();
+            generateAddress();
+        });
+    </script>
+</body>
+</html>

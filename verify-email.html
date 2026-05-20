@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Email - Advancia Payledger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .links {
+            margin-top: 20px;
+        }
+
+        .links a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+
+        .success {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            display: none;
+            color: #f39c12;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Verify Your Email</h1>
+            <p>Enter the verification code sent to your email</p>
+        </div>
+
+        <div id="manual-verify">
+            <form id="verify-form">
+                <div class="form-group">
+                    <input type="text" id="token" placeholder="Enter verification token" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Verify Email</button>
+            </form>
+        </div>
+
+        <div id="auto-verify" style="display: none;">
+            <div class="loading">
+                <p>Verifying your email...</p>
+            </div>
+        </div>
+
+        <div class="links">
+            <a href="login.html">Back to Login</a> | <a href="register.html">Register Again</a>
+        </div>
+
+        <div id="error-message" class="error" style="display: none;"></div>
+        <div id="success-message" class="success" style="display: none;"></div>
+    </div>
+
+    <script>
+        const API_BASE = '/auth';
+
+        // Check for token in URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (token) {
+            // Auto-verify if token is in URL
+            document.getElementById('manual-verify').style.display = 'none';
+            document.getElementById('auto-verify').style.display = 'block';
+            verifyEmail(token);
+        }
+
+        // Handle manual verification
+        document.getElementById('verify-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const token = document.getElementById('token').value;
+            await verifyEmail(token);
+        });
+
+        async function verifyEmail(token) {
+            try {
+                const response = await fetch(`${API_BASE}/verify-email`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: token })
+                });
+
+                if (response.ok) {
+                    showSuccess('Email verified successfully! Please complete KYC verification to activate your account.');
+                    setTimeout(() => {
+                        window.location.href = 'kyc.html';
+                    }, 2000);
+                } else {
+                    const error = await response.json();
+                    showError(error.detail || 'Verification failed');
+                    document.getElementById('manual-verify').style.display = 'block';
+                    document.getElementById('auto-verify').style.display = 'none';
+                }
+            } catch (error) {
+                showError('Network error during verification');
+                document.getElementById('manual-verify').style.display = 'block';
+                document.getElementById('auto-verify').style.display = 'none';
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('error-message').textContent = message;
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            document.getElementById('success-message').textContent = message;
+            document.getElementById('success-message').style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

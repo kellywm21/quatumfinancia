@@ -18,9 +18,17 @@ class Settings(BaseSettings):
     port: int = 8000
     
     # JWT Configuration
-    jwt_secret_key: str = "your-secret-key-change-in-production"
+    jwt_secret_key: str = "your-super-secret-jwt-key-change-this-in-production"
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = 30
+    
+    # Email Configuration
+    smtp_server: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    sender_email: str = "noreply@advancia.com"
+    sender_password: str = ""
+    app_url: str = "http://localhost:8000"
+    email_test_mode: bool = False
     
     class Config:
         env_file = ".env"

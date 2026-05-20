@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Advancia Payledger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 24px;
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #dfe6ee;
+        }
+
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            padding: 16px;
+            background: #34495e;
+        }
+
+        .nav-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #2980b9;
+        }
+
+        .nav-badge {
+            display: inline-block;
+            min-width: 22px;
+            padding: 2px 8px;
+            margin-left: 8px;
+            border-radius: 999px;
+            background: #e74c3c;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 12px;
+        }
+
+        .section-header h2 {
+            font-size: 1.6rem;
+            color: #2c3e50;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            background: #e74c3c;
+        }
+
+        .badge.unread {
+            background: #e67e22;
+        }
+
+        .table-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+        }
+
+        tr:nth-child(even) {
+            background: #ffffff;
+        }
+
+        tr:nth-child(odd) {
+            background: #f2f4f7;
+        }
+
+        .status-pill {
+            padding: 6px 10px;
+            border-radius: 999px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .status-read {
+            background: #2ecc71;
+        }
+
+        .status-unread {
+            background: #f39c12;
+        }
+
+        .action-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .action-btn:hover {
+            background: #2980b9;
+        }
+
+        .small-btn {
+            background: #7f8c8d;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+
+        .small-btn:hover {
+            background: #606c76;
+        }
+
+        .no-data {
+            padding: 40px;
+            text-align: center;
+            color: #777;
+        }
+
+        @media (max-width: 860px) {
+            .section-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .nav {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Notifications</h1>
+            <p>View your latest in-app alerts and keep your account up to date.</p>
+        </div>
+
+        <div class="nav">
+            <a href="wallet_dashboard.html" class="nav-btn">Wallet Dashboard</a>
+            <a href="transaction_pin.html" class="nav-btn">Transaction PIN</a>
+            <a href="deposit_address.html" class="nav-btn">Deposit Address</a>
+            <a href="buy_crypto.html" class="nav-btn">Buy Crypto</a>
+            <a href="pending_approvals.html" class="nav-btn">Pending Approvals</a>
+            <a href="notifications.html" class="nav-btn" id="notifications-link">Notifications<span id="notifications-badge" class="nav-badge hidden">0</span></a>
+        </div>
+
+        <div class="content">
+            <div class="section-header">
+                <h2>Your Notifications</h2>
+                <div>
+                    <span id="notification-count" class="badge unread">0 unread</span>
+                    <button class="action-btn small-btn" onclick="markAllRead()">Mark all read</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Title</th>
+                            <th>Message</th>
+                            <th>Status</th>
+                            <th>Received</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notifications-body">
+                        <tr><td colspan="6" class="no-data">Loading notifications...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const getAuthHeaders = (json = false) => {
+            const token = localStorage.getItem('token');
+            const headers = {};
+            if (json) headers['Content-Type'] = 'application/json';
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            if (!token) {
+                window.location.href = '/login.html';
+            }
+            return headers;
+        };
+
+        window.addEventListener('load', () => {
+            loadNotifications();
+        });
+
+        async function loadNotifications() {
+            try {
+                const [allResponse, countResponse] = await Promise.all([
+                    fetch('/api/notifications/user/all', { headers: getAuthHeaders() }),
+                    fetch('/api/notifications/user/unread-count', { headers: getAuthHeaders() })
+                ]);
+
+                if (!allResponse.ok || !countResponse.ok) {
+                    throw new Error('Unable to load notifications');
+                }
+
+                const notifications = await allResponse.json();
+                const countData = await countResponse.json();
+                const unreadCount = countData.unread_count || 0;
+
+                document.getElementById('notification-count').textContent = `${unreadCount} unread`;
+
+                const navBadge = document.getElementById('notifications-badge');
+                if (navBadge) {
+                    if (unreadCount > 0) {
+                        navBadge.textContent = unreadCount;
+                        navBadge.classList.remove('hidden');
+                    } else {
+                        navBadge.classList.add('hidden');
+                    }
+                }
+
+                renderNotifications(notifications);
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+                document.getElementById('notifications-body').innerHTML = '<tr><td colspan="6" class="no-data">Unable to load notifications.</td></tr>';
+            }
+        }
+
+        function renderNotifications(notifications) {
+            const tbody = document.getElementById('notifications-body');
+            if (!notifications || notifications.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">No notifications available.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = notifications.map(note => `
+                <tr>
+                    <td>${note.event_type}</td>
+                    <td>${note.title}</td>
+                    <td>${note.message}</td>
+                    <td><span class="status-pill ${note.read ? 'status-read' : 'status-unread'}">${note.read ? 'Read' : 'Unread'}</span></td>
+                    <td>${new Date(note.created_at).toLocaleString()}</td>
+                    <td>
+                        ${note.read ? '' : `<button class="action-btn small-btn" onclick="markRead(${note.id})">Mark read</button>`}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function markRead(notificationId) {
+            try {
+                const response = await fetch(`/api/notifications/user/${notificationId}/read`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(true)
+                });
+                if (!response.ok) {
+                    throw new Error('Unable to mark notification read');
+                }
+                await loadNotifications();
+            } catch (error) {
+                console.error('Error marking notification read:', error);
+                alert('Could not mark notification as read.');
+            }
+        }
+
+        async function markAllRead() {
+            try {
+                const response = await fetch('/api/notifications/user/read-all', {
+                    method: 'POST',
+                    headers: getAuthHeaders(true)
+                });
+                if (!response.ok) {
+                    throw new Error('Unable to mark all notifications read');
+                }
+                await loadNotifications();
+            } catch (error) {
+                console.error('Error marking all notifications read:', error);
+                alert('Could not mark all notifications as read.');
+            }
+        }
+    </script>
+</body>
+</html>
