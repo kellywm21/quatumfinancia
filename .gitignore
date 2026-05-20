@@ -40,4 +40,6 @@ htmlcov/
 *.sqlite
 *.sqlite3
 
+.git_deploy_keys/
+
 .DS_Store
