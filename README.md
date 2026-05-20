@@ -1,9 +1,12 @@
 # Advancia Payledger - Smart Wallet & Payroll Platform
 
-[![CI](https://github.com/advanciapayroll-ops/advancia-payledger/actions/workflows/ci.yml/badge.svg)](https://github.com/advanciapayroll-ops/advancia-payledger/actions/workflows/ci.yml)
+[![CI][ci-badge]][ci-link]
 
 A comprehensive FastAPI-based digital wallet and payroll platform with
 gasless transactions, non-custodial crypto wallets, and instant virtual card issuance.
+
+[ci-badge]: https://github.com/advanciapayroll-ops/advancia-payledger/actions/workflows/ci.yml/badge.svg
+[ci-link]: https://github.com/advanciapayroll-ops/advancia-payledger/actions/workflows/ci.yml
 
 ## ✨ Features
 
@@ -61,6 +64,7 @@ cp .env.example .env
 ```
 
 The `.env.example` file includes placeholder values for:
+
 ```
 LITHIC_API_KEY=your_lithic_api_key_here
 LITHIC_API_BASE_URL=https://sandbox.lithic.com
@@ -71,11 +75,13 @@ EMAIL_TEST_MODE=true
 ```
 
 If you want to use Supabase/PostgreSQL instead of local SQLite, add a `DATABASE_URL` value:
+
 ```
 DATABASE_URL=postgresql://postgres:<YOUR-PASSWORD>@db.raomhogdritoqzxghngh.supabase.co:5432/postgres
 ```
 
 If your environment does not support direct IPv4 access, use the Supabase pooler host instead:
+
 ```
 DATABASE_URL=postgresql://postgres:<YOUR-PASSWORD>@aws-1-us-west-1.pooler.supabase.com:5432/postgres
 ```
@@ -83,6 +89,7 @@ DATABASE_URL=postgresql://postgres:<YOUR-PASSWORD>@aws-1-us-west-1.pooler.supaba
 > Make sure you replace `<YOUR-PASSWORD>` with your actual Supabase database password.
 
 ### 4. Run the Application
+
 ```bash
 python -m src.main
 ```
@@ -94,6 +101,7 @@ The server starts at **http://localhost:8000**
 All API endpoints require JWT authentication. First, register and login to get an access token:
 
 ### Register User
+
 ```bash
 POST /auth/register
 {
@@ -105,6 +113,7 @@ POST /auth/register
 ```
 
 ### Login
+
 ```bash
 POST /auth/login
 Form data:
@@ -119,6 +128,7 @@ Response:
 
 ### Use API with Authentication
 Include the Authorization header in all requests:
+
 ```
 Authorization: Bearer <access_token>
 ```
@@ -281,7 +291,8 @@ await lithic.financialAccounts.load({
 // Result: REAL card. REAL balance. Usable at any Mastercard merchant.
 ```
 
-**Note**: The Python implementation uses `account_holders.create` instead of `accounts.create` for proper KYC handling, and funding is implemented via book transfers in production environments.
+**Note**: The Python implementation uses `account_holders.create` instead of `accounts.create` for proper KYC handling.
+Funding is implemented via book transfers in production environments.
 
 This will:
 1. ✅ Create a cardholder account
@@ -291,6 +302,7 @@ This will:
 5. ✅ Save configuration to `card_config.json`
 
 Expected output:
+
 ```
 ======================================================================
 LITHIC VIRTUAL CARD ISSUANCE DEMO
@@ -355,11 +367,13 @@ Visit **http://localhost:8000/docs** (Swagger UI) for interactive API testing
 ## Testing
 
 Run the test suite:
+
 ```bash
 pytest
 ```
 
 Run specific tests:
+
 ```bash
 pytest tests/test_main.py -v
 ```
@@ -395,11 +409,14 @@ When you issue a card, Lithic returns:
 }
 ```
 
-**IMPORTANT**: The full 16-digit PAN is returned by Lithic once and should be securely stored/transmitted to cardholders. The API only stores last-4 for security.
+**IMPORTANT**: The full 16-digit PAN is returned by Lithic once and should be securely stored.
+Transmit it to cardholders securely.
+The API only stores last-4 for security.
 
 ## Use Cases
 
 ### 1. Business Expense Management
+
 ```python
 # Issue per-employee cards with individual spend limits
 # Track and reconcile expenses automatically
@@ -407,6 +424,7 @@ When you issue a card, Lithic returns:
 ```
 
 ### 2. Vendor Payment Automation
+
 ```python
 # Create cards for specific vendors
 # Set spending limits per transaction type
@@ -414,6 +432,7 @@ When you issue a card, Lithic returns:
 ```
 
 ### 3. Multi-currency Operations
+
 ```python
 # Issue cards for different regions
 # Load balances in local currency
@@ -421,6 +440,7 @@ When you issue a card, Lithic returns:
 ```
 
 ### 4. Development/Testing
+
 ```python
 # Free sandbox environment
 # Test card creation, funding, and transactions
@@ -444,6 +464,7 @@ When you issue a card, Lithic returns:
 ## Sandbox vs Production
 
 ### Sandbox (Development)
+
 ```bash
 # Free tier - unlimited cards, $1M monthly limit
 LITHIC_API_KEY=sandbox_key_...
@@ -451,13 +472,69 @@ LITHIC_API_BASE_URL=https://sandbox.lithic.com
 ```
 
 ### Production
+
 ```bash
 # After verifying account with Lithic
 LITHIC_API_KEY=prod_key_...
 LITHIC_API_BASE_URL=https://api.lithic.com
 ```
 
+## Deploy on Fly
+
+This repo includes a `Dockerfile` and `fly.toml` for Fly deployment.
+
+### 1. Install and authenticate
+Install `flyctl` locally and log in with your Fly token:
+
+```powershell
+winget install Fly.Flyctl
+flyctl auth login --access-token $env:FLY_API_TOKEN
+```
+
+If you do not want to store the token in your environment, use the plain command:
+
+```powershell
+flyctl auth login --access-token YOUR_FLY_TOKEN
+```
+
+### 2. Verify your Fly app exists
+
+```bash
+flyctl apps list
+```
+
+### 3. Deploy the app
+
+```bash
+flyctl deploy -a app-damp-sun-5680
+```
+
+### 4. Build only and push the image
+
+```bash
+flyctl deploy --build-only --push -a app-damp-sun-5680
+```
+
+The container starts with Uvicorn using:
+
+```bash
+uvicorn src.main:app --host 0.0.0.0 --port 8080
+```
+
 ## Support & Resources
+
+## CI Deployment (GitHub Actions)
+
+A GitHub Actions workflow is included to deploy the app to Fly on pushes to `main`.
+
+Setup:
+
+- Add the secret `FLY_API_TOKEN` to your repository (Settings → Secrets).
+- Add the secret `FLY_APP_NAME` with the Fly app name (for example `app-damp-sun-5680`).
+
+The workflow is at `.github/workflows/deploy-fly.yml` and will invoke `flyctl deploy` using those secrets.
+
+If you prefer local deploys, install `flyctl` and run the `deploy-fly.ps1` helper.
 
 - 📚 [Lithic API Documentation](https://docs.lithic.com)
 - 🎓 [Python SDK Guide](https://github.com/lithic-com/lithic-python)
