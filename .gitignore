@@ -41,5 +41,6 @@ htmlcov/
 *.sqlite3
 
 .git_deploy_keys/
+remote_test_clone/
 
 .DS_Store
