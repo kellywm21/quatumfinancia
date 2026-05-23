@@ -23,7 +23,7 @@ gasless transactions, non-custodial crypto wallets, and instant virtual card iss
 
 ## Project Structure
 
-```
+```bash
 advancia-payledger/
 ├── src/
 │   ├── api/              # FastAPI route handlers
@@ -57,6 +57,7 @@ pip install -r requirements.txt
 ```
 
 ### 3. Configure Environment
+
 Copy the sample environment file into `.env` and update values for your local setup:
 
 ```bash
@@ -65,7 +66,7 @@ cp .env.example .env
 
 The `.env.example` file includes placeholder values for:
 
-```
+```bash
 LITHIC_API_KEY=your_lithic_api_key_here
 LITHIC_API_BASE_URL=https://sandbox.lithic.com
 JWT_SECRET_KEY=your_jwt_secret_here
@@ -74,15 +75,17 @@ JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30
 EMAIL_TEST_MODE=true
 ```
 
-If you want to use Supabase/PostgreSQL instead of local SQLite, add a `DATABASE_URL` value:
+If you want to use Supabase/PostgreSQL instead of local SQLite,
+add a `DATABASE_URL` value:
 
-```
+```bash
 DATABASE_URL=postgresql://postgres:<YOUR-PASSWORD>@db.raomhogdritoqzxghngh.supabase.co:5432/postgres
 ```
 
-If your environment does not support direct IPv4 access, use the Supabase pooler host instead:
+If your environment does not support direct IPv4 access,
+use the Supabase pooler host instead:
 
-```
+```bash
 DATABASE_URL=postgresql://postgres:<YOUR-PASSWORD>@aws-1-us-west-1.pooler.supabase.com:5432/postgres
 ```
 
@@ -94,11 +97,12 @@ DATABASE_URL=postgresql://postgres:<YOUR-PASSWORD>@aws-1-us-west-1.pooler.supaba
 python -m src.main
 ```
 
-The server starts at **http://localhost:8000**
+The server starts at **[http://localhost:8000](http://localhost:8000)**
 
 ## Authentication
 
-All API endpoints require JWT authentication. First, register and login to get an access token:
+All API endpoints require JWT authentication.
+First, register and login to get an access token:
 
 ### Register User
 
@@ -127,20 +131,23 @@ Response:
 ```
 
 ### Use API with Authentication
+
 Include the Authorization header in all requests:
 
-```
+```bash
 Authorization: Bearer <access_token>
 ```
 
 ## API Endpoints
 
-### Authentication
+### Auth API
+
 - `POST /auth/register` - Register new user
 - `POST /auth/login` - Login and get access token
 - `GET /auth/me` - Get current user profile (requires auth)
 
 ### Cardholders (Requires Authentication)
+
 Create and manage business accounts:
 
 ```bash
@@ -162,6 +169,7 @@ Authorization: Bearer <token>
 ```
 
 ### Virtual Cards (Requires Authentication)
+
 Issue and manage cards:
 
 ```bash
@@ -199,6 +207,7 @@ Authorization: Bearer <token>
 ```
 
 ### Payments (Requires Authentication)
+
 Track payment transactions:
 
 ```bash
@@ -233,6 +242,7 @@ python lithic_card_demo.py
 ```
 
 This will:
+
 1. 🔐 Register/login a demo user and get JWT token
 2. ✅ Create a cardholder account (authenticated)
 3. ✅ Issue a real virtual Mastercard (authenticated)
@@ -288,13 +298,16 @@ await lithic.financialAccounts.load({
   memo: 'Initial card funding via ACH',
 });
 
-// Result: REAL card. REAL balance. Usable at any Mastercard merchant.
+// Result: REAL card and balance.
+// Usable at any Mastercard merchant.
 ```
 
-**Note**: The Python implementation uses `account_holders.create` instead of `accounts.create` for proper KYC handling.
+**Note**: The Python implementation uses
+`account_holders.create` instead of `accounts.create` for proper KYC handling.
 Funding is implemented via book transfers in production environments.
 
 This will:
+
 1. ✅ Create a cardholder account
 2. ✅ Issue a real virtual Mastercard
 3. ✅ Check account balance
@@ -303,7 +316,7 @@ This will:
 
 Expected output:
 
-```
+```bash
 ======================================================================
 LITHIC VIRTUAL CARD ISSUANCE DEMO
 ======================================================================
@@ -362,7 +375,8 @@ Your REAL virtual Mastercard is ready to use:
 
 ## API Documentation
 
-Visit **http://localhost:8000/docs** (Swagger UI) for interactive API testing
+Visit the Swagger UI at
+[http://localhost:8000/docs](http://localhost:8000/docs) for interactive API testing
 
 ## Testing
 
@@ -409,8 +423,8 @@ When you issue a card, Lithic returns:
 }
 ```
 
-**IMPORTANT**: The full 16-digit PAN is returned by Lithic once and should be securely stored.
-Transmit it to cardholders securely.
+**IMPORTANT**: The full 16-digit PAN is returned by Lithic once.
+Store it securely and transmit it to cardholders safely.
 The API only stores last-4 for security.
 
 ## Use Cases
@@ -450,12 +464,14 @@ The API only stores last-4 for security.
 ## Security Notes
 
 ⚠️ **PCI Compliance**:
+
 - Never log or store full card PANs
 - Always use HTTPS in production
 - Rotate API keys regularly
 - Implement rate limiting on endpoints
 
 ✅ **This Implementation**:
+
 - Stores only last-4 digits in database
 - Masks CVV in responses
 - Full PAN only visible once during issuance
@@ -484,6 +500,7 @@ LITHIC_API_BASE_URL=https://api.lithic.com
 This repo includes a `Dockerfile` and `fly.toml` for Fly deployment.
 
 ### 1. Install and authenticate
+
 Install `flyctl` locally and log in with your Fly token:
 
 ```powershell
@@ -532,7 +549,8 @@ Setup:
 - Add the secret `FLY_API_TOKEN` to your repository (Settings → Secrets).
 - Add the secret `FLY_APP_NAME` with the Fly app name (for example `app-damp-sun-5680`).
 
-The workflow is at `.github/workflows/deploy-fly.yml` and will invoke `flyctl deploy` using those secrets.
+The workflow is at `.github/workflows/deploy-fly.yml`.
+It invokes `flyctl deploy` using those secrets.
 
 If you prefer local deploys, install `flyctl` and run the `deploy-fly.ps1` helper.
 

@@ -3,15 +3,21 @@
 ## 3-Minute Setup
 
 ### Step 1: Start the Server
+
 ```bash
 python -m src.main
 ```
-✅ Server running at http://localhost:8000
+
+✅ Server running at [http://localhost:8000](http://localhost:8000)
 
 ### Step 2: Create a Cardholder
-Open http://localhost:8000/docs and use the **Swagger UI** to:
+
+Open the Swagger UI at
+[http://localhost:8000/docs](http://localhost:8000/docs).
+Use it to:
 
 **POST** `/api/cardholders/`
+
 ```json
 {
   "email": "business@advancia.com",
@@ -20,6 +26,7 @@ Open http://localhost:8000/docs and use the **Swagger UI** to:
 ```
 
 **Response:**
+
 ```json
 {
   "id": 1,
@@ -35,7 +42,9 @@ Open http://localhost:8000/docs and use the **Swagger UI** to:
 👉 **Save the `account_token`** - you'll need it next!
 
 ### Step 3: Issue a Virtual Card
+
 **POST** `/api/cards/`
+
 ```json
 {
   "account_token": "account_xyz123...",
@@ -47,6 +56,7 @@ Open http://localhost:8000/docs and use the **Swagger UI** to:
 ```
 
 **Response:**
+
 ```json
 {
   "id": 1,
@@ -68,12 +78,15 @@ Open http://localhost:8000/docs and use the **Swagger UI** to:
 ```
 
 🎉 **You now have a REAL Mastercard!**
-- **Full PAN**: Shown once by Lithic, securely share with cardholder
+
+- **Full PAN**: Shown once by Lithic. Share it securely with the cardholder
 - **CVV**: 123
 - **Expiry**: 12/2027
 
 ### Step 4: Fund the Card
+
 **POST** `/api/cards/fund`
+
 ```json
 {
   "card_token": "card_xyz456...",
@@ -83,6 +96,7 @@ Open http://localhost:8000/docs and use the **Swagger UI** to:
 ```
 
 **Response:**
+
 ```json
 {
   "card_token": "card_xyz456...",
@@ -95,9 +109,11 @@ Open http://localhost:8000/docs and use the **Swagger UI** to:
 ✅ **$84,320 loaded to card!** Card is now ready to use.
 
 ### Step 5: Check Balance
+
 **GET** `/api/cards/card_xyz456.../balance`
 
 **Response:**
+
 ```json
 {
   "financial_account_token": "fin_acc_xyz...",
@@ -113,13 +129,15 @@ Open http://localhost:8000/docs and use the **Swagger UI** to:
 ## Run the Automated Demo
 
 Instead of manual steps, run:
+
 ```bash
 python lithic_card_demo.py
 ```
 
 This automatically:
+
 1. Creates cardholder
-2. Issues virtual card  
+2. Issues virtual card
 3. Funds card with $84,320
 4. Retrieves and displays balance
 5. Saves configuration to `card_config.json`
@@ -142,26 +160,30 @@ This automatically:
 ## API Response Codes
 
 | Code | Meaning |
-|------|---------|
-| 200  | ✅ Success |
-| 400  | ❌ Bad request (invalid email, duplicate account, etc.) |
-| 404  | ❌ Not found (cardholder/card doesn't exist) |
-| 500  | ❌ Server error |
+| ------ | --------- |
+| 200 | ✅ Success |
+| 400 | ❌ Bad request (invalid email, duplicate account, etc.) |
+| 404 | ❌ Not found (cardholder/card doesn't exist) |
+| 500 | ❌ Server error |
 
 ---
 
 ## Common Issues
 
-**Q: "Email already registered"**
+### Q: "Email already registered"
+
 - Use a different email address or retrieve existing cardholder with GET /api/cardholders/
 
-**Q: "Cardholder not found"**
+### Q: "Cardholder not found"
+
 - Make sure you use the correct `account_token` from Step 2
 
-**Q: "Card financial account not configured"**
+### Q: "Card financial account not configured"
+
 - Try creating the card again; financial account is auto-assigned
 
-**Q: "Could not connect to API"**
+### Q: "Could not connect to API"
+
 - Make sure the server is running: `python -m src.main`
 
 ---
@@ -169,6 +191,7 @@ This automatically:
 ## Security Reminders
 
 ⚠️ **In Production:**
+
 - Use HTTPS only (not HTTP)
 - Rotate API keys regularly
 - Never log full card PANs
@@ -177,6 +200,7 @@ This automatically:
 - Audit all card operations
 
 ✅ **In Sandbox:**
+
 - No real money involved
 - Use for testing safely
 - Non-production keys only
@@ -214,4 +238,4 @@ This automatically:
 
 ---
 
-**Happy card issuing! 🚀**
+### Happy card issuing! 🚀
