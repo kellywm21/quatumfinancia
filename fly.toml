@@ -1,4 +1,4 @@
-app = "app-damp-sun-5680"
+app = "advancia-quatum"
 
 kill_signal = "SIGINT"
 kill_timeout = 5
