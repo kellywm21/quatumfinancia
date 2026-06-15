@@ -1,6 +1,8 @@
 # Advancia Payledger - Payment Processing API with Authentication
 
-[![CI](https://github.com/advanciahealthcare-ops/advancia-payledger/actions/workflows/ci.yml/badge.svg)](https://github.com/advanciahealthcare-ops/advancia-payledger/actions/workflows/ci.yml)
+[![CI](https://github.com/kellywm21/quatumfinancia/actions/workflows/ci.yml/badge.svg)](https://github.com/kellywm21/quatumfinancia/actions/workflows/ci.yml)
+[![CI Dispatch](https://github.com/kellywm21/quatumfinancia/actions/workflows/ci-dispatch.yml/badge.svg)](https://github.com/kellywm21/quatumfinancia/actions/workflows/ci-dispatch.yml)
+[![E2E Windows](https://github.com/kellywm21/quatumfinancia/actions/workflows/e2e-windows.yml/badge.svg)](https://github.com/kellywm21/quatumfinancia/actions/workflows/e2e-windows.yml)
 
 A FastAPI-based payment processing platform with Lithic card issuance
 integration and JWT authentication.
