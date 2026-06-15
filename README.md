@@ -84,6 +84,13 @@ LITHIC_API_KEY=
 ```
 This will bypass real Lithic API calls and still let you exercise authentication, cardholder creation, card issuance, funding, and balance endpoints locally.
 
+### Manual CI Dispatch
+A manual CI workflow is available at `ci-dispatch.yml`. Use it to run the full test suite on demand without waiting for a push or pull request.
+
+- Workflow file: `.github/workflows/ci-dispatch.yml`
+- Trigger: `workflow_dispatch`
+- Uses PostgreSQL service and runs `python -m pytest -q`
+
 ### Test mode and auto-verify
 
 For CI and E2E testing we provide a test mode that can auto-verify newly registered users to simplify automated flows. This is gated behind two environment variables:
