@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = 30
     use_mock_lithic: bool = False
+    # Test mode controls
+    allow_auto_verify: bool = False
     
     # Email Configuration
     smtp_server: str = "smtp.gmail.com"
