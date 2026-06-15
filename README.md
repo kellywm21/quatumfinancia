@@ -82,6 +82,17 @@ LITHIC_API_KEY=
 ```
 This will bypass real Lithic API calls and still let you exercise authentication, cardholder creation, card issuance, funding, and balance endpoints locally.
 
+### Test mode and auto-verify
+
+For CI and E2E testing we provide a test mode that can auto-verify newly registered users to simplify automated flows. This is gated behind two environment variables:
+
+- `EMAIL_TEST_MODE=true` — enables test-mode behavior in the app.
+- `ALLOW_AUTO_VERIFY=true` — must be explicitly set to allow auto-verification of newly registered users.
+
+Both variables must be set for auto-verification to occur. This reduces the risk of accidental auto-verification in production. The E2E workflow sets `ALLOW_AUTO_VERIFY=true` only for test runs.
+
+Before promoting to production, remove `ALLOW_AUTO_VERIFY` usage and ensure real email verification is enforced. See issue #2 for tracking.
+
 ### 4. Run the Application
 ```bash
 python -m src.main
