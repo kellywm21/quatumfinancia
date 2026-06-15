@@ -34,6 +34,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     # Create new user
     hashed_password = get_password_hash(user.password)
     verification_token = secrets.token_urlsafe(32)
+    email_verified = settings.email_test_mode
+    email_verification_token = None if settings.email_test_mode else verification_token
     
     db_user = User(
         email=user.email,
@@ -41,31 +43,39 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         hashed_password=hashed_password,
         full_name=user.full_name,
         phone_number=user.phone_number,
-        email_verification_token=verification_token,
-        email_verified=False,
+        email_verification_token=email_verification_token,
+        email_verified=email_verified,
         kyc_status="pending"
     )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     
-    # Create email verification record
-    expires_at = datetime.utcnow() + timedelta(hours=24)
-    email_verification = EmailVerification(
-        user_id=db_user.id,
-        token=verification_token,
-        email=user.email,
-        expires_at=expires_at
-    )
-    db.add(email_verification)
-    db.commit()
-    
-    # Send verification email
-    email_service.send_verification_email(
-        recipient_email=user.email,
-        username=user.username,
-        token=verification_token
-    )
+    if not settings.email_test_mode:
+        # Create email verification record
+        expires_at = datetime.utcnow() + timedelta(hours=24)
+        email_verification = EmailVerification(
+            user_id=db_user.id,
+            token=verification_token,
+            email=user.email,
+            expires_at=expires_at
+        )
+        db.add(email_verification)
+        db.commit()
+        
+        # Send verification email
+        email_service.send_verification_email(
+            recipient_email=user.email,
+            username=user.username,
+            token=verification_token
+        )
+    else:
+        # In email test mode, skip verification email sending but keep user verified
+        email_service.send_verification_email(
+            recipient_email=user.email,
+            username=user.username,
+            token=verification_token
+        )
     
     return db_user
 
