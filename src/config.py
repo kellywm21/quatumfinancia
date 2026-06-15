@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     jwt_secret_key: str = "your-super-secret-jwt-key-change-this-in-production"
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = 30
+    use_mock_lithic: bool = False
     
     # Email Configuration
     smtp_server: str = "smtp.gmail.com"

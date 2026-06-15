@@ -37,8 +37,23 @@ jobs:
       - name: Start API server
         shell: pwsh
         run: |
-          Start-Process -FilePath python -ArgumentList '-m','src.main' -NoNewWindow -PassThru
-          Start-Sleep -Seconds 8
+          $proc = Start-Process -FilePath python -ArgumentList '-m','src.main' -NoNewWindow -PassThru
+          $timeout = 60
+          $start = Get-Date
+          $serverReady = $false
+          while ((Get-Date) -lt $start.AddSeconds($timeout)) {
+            try {
+              Invoke-RestMethod -Uri 'http://127.0.0.1:8000/health' -TimeoutSec 5 | Out-Null
+              Write-Output 'Server is ready'
+              $serverReady = $true
+              break
+            } catch {
+              Start-Sleep -Seconds 2
+            }
+          }
+          if (-not $serverReady) {
+            throw 'API server failed to start within timeout'
+          }
 
       - name: Run verification script
         shell: pwsh
