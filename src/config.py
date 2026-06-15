@@ -3,7 +3,7 @@ from typing import Optional
 
 class Settings(BaseSettings):
     app_name: str = "Payment Processing API"
-    app_version: str = "1.0.0"
+    app_version: str = "1.0.1"
     debug: bool = False
     
     # Lithic API Configuration
