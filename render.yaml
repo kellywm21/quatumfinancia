@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: quatumfinancia
+    runtime: python
+    runtimeVersion: 3.11.9
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m src.main
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
