@@ -7,3 +7,4 @@ All notable changes to this project will be documented in this file.
 - Fix: Use demo user email in `verify_demo.ps1` when creating cardholder during E2E.
 - Add: `/api/financial-accounts` endpoint to support E2E balance checks.
 - CI: Windows E2E workflow improvements and mock Lithic support.
+ - Security: Gate test auto-verify behind `ALLOW_AUTO_VERIFY` env var; E2E workflow sets this variable.
