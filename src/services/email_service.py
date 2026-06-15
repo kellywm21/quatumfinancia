@@ -1,20 +1,20 @@
-import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 from typing import Optional
+from src.config import settings
 
 class EmailService:
     """Service for sending email notifications"""
     
     def __init__(self):
-        self.smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com")
-        self.smtp_port = int(os.getenv("SMTP_PORT", "587"))
-        self.sender_email = os.getenv("SENDER_EMAIL", "noreply@advancia.com")
-        self.sender_password = os.getenv("SENDER_PASSWORD", "")
-        self.app_url = os.getenv("APP_URL", "http://localhost:8000")
-        self.test_mode = os.getenv("EMAIL_TEST_MODE", "false").lower() == "true"
+        self.smtp_server = settings.smtp_server
+        self.smtp_port = settings.smtp_port
+        self.sender_email = settings.sender_email
+        self.sender_password = settings.sender_password
+        self.app_url = settings.app_url
+        self.test_mode = settings.email_test_mode
     
     def send_verification_email(self, recipient_email: str, username: str, token: str) -> bool:
         """Send email verification link"""

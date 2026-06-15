@@ -1,0 +1,64 @@
+name: E2E-Windows
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  e2e:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Create .env
+        run: |
+          echo LITHIC_API_KEY=${{ secrets.LITHIC_API_KEY }} > .env
+          echo LITHIC_API_BASE_URL=https://sandbox.lithic.com >> .env
+          echo USE_MOCK_LITHIC=true >> .env
+          echo EMAIL_TEST_MODE=true >> .env
+          echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
+          echo JWT_ALGORITHM=HS256 >> .env
+          echo JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30 >> .env
+          echo DATABASE_URL=sqlite:///./payments.db >> .env
+
+      - name: Start API server and run verification
+        shell: pwsh
+        run: |
+          $proc = Start-Process -FilePath python -ArgumentList '-m','src.main' -NoNewWindow -PassThru
+          $timeout = 60
+          $start = Get-Date
+          $serverReady = $false
+          while ((Get-Date) -lt $start.AddSeconds($timeout)) {
+            try {
+              Invoke-RestMethod -Uri 'http://127.0.0.1:8000/health' -TimeoutSec 5 | Out-Null
+              Write-Output 'Server is ready'
+              $serverReady = $true
+              break
+            } catch {
+              Start-Sleep -Seconds 2
+            }
+          }
+          if (-not $serverReady) {
+            throw 'API server failed to start within timeout'
+          }
+
+          Write-Output 'Running verification script'
+          .\verify_demo.ps1
+          if (-not $proc.HasExited) {
+            Write-Output 'Stopping API server'
+            $proc.Kill()
+          }
