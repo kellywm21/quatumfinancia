@@ -34,7 +34,7 @@ jobs:
           echo JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30 >> .env
           echo DATABASE_URL=sqlite:///./payments.db >> .env
 
-      - name: Start API server
+      - name: Start API server and run verification
         shell: pwsh
         run: |
           $proc = Start-Process -FilePath python -ArgumentList '-m','src.main' -NoNewWindow -PassThru
@@ -55,7 +55,9 @@ jobs:
             throw 'API server failed to start within timeout'
           }
 
-      - name: Run verification script
-        shell: pwsh
-        run: |
+          Write-Output 'Running verification script'
           .\verify_demo.ps1
+          if (-not $proc.HasExited) {
+            Write-Output 'Stopping API server'
+            $proc.Kill()
+          }
