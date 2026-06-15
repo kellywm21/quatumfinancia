@@ -34,8 +34,9 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     # Create new user
     hashed_password = get_password_hash(user.password)
     verification_token = secrets.token_urlsafe(32)
-    email_verified = settings.email_test_mode
-    email_verification_token = None if settings.email_test_mode else verification_token
+    # Only auto-verify in test mode when explicitly allowed (safer for CI)
+    email_verified = settings.email_test_mode and settings.allow_auto_verify
+    email_verification_token = None if email_verified else verification_token
     
     db_user = User(
         email=user.email,
@@ -51,7 +52,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_user)
     
-    if not settings.email_test_mode:
+    if not email_verified:
         # Create email verification record
         expires_at = datetime.utcnow() + timedelta(hours=24)
         email_verification = EmailVerification(
@@ -70,7 +71,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
             token=verification_token
         )
     else:
-        # In email test mode, skip verification email sending but keep user verified
+        # In test mode with auto-verify allowed, do not send outgoing verification emails
+        # but log the intended action via the email service (it already handles test mode)
         email_service.send_verification_email(
             recipient_email=user.email,
             username=user.username,
