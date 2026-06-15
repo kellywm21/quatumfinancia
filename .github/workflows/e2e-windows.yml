@@ -30,6 +30,7 @@ jobs:
           echo LITHIC_API_BASE_URL=https://sandbox.lithic.com >> .env
           echo USE_MOCK_LITHIC=true >> .env
           echo EMAIL_TEST_MODE=true >> .env
+          echo ALLOW_AUTO_VERIFY=true >> .env
           echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
           echo JWT_ALGORITHM=HS256 >> .env
           echo JWT_ACCESS_TOKEN_EXPIRE_MINUTES=30 >> .env
