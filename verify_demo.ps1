@@ -36,7 +36,8 @@ try{
 
 try{
     Write-Output "Creating cardholder..."
-    $chBody = @{ email = "business-$unique@advancia.com"; business_name = 'Advancia Demo' }
+    # Use the demo user's email in test mode so the demo user can issue cards for this cardholder
+    $chBody = @{ email = $email; business_name = 'Advancia Demo' }
     $cardholder = Invoke-RestMethod -Uri "$BaseUrl/api/cardholders/" -Method POST -Headers $headers -ContentType 'application/json' -Body ($chBody | ConvertTo-Json -Depth 5) -TimeoutSec 20
     Write-Output "Cardholder created: $($cardholder.account_token)"
 } catch {
