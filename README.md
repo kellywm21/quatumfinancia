@@ -321,6 +321,23 @@ Notes:
 - The E2E job uses mock Lithic mode by default (`USE_MOCK_LITHIC=true`). If you wish to test against real Lithic sandbox, set `USE_MOCK_LITHIC=false` and provide `LITHIC_API_KEY` as a repository secret.
 - GitHub Actions already provides a built-in `GITHUB_TOKEN` — do not share personal access tokens in repo files or in chat.
 
+## Deployment
+
+The repository no longer uses Fly.io deployment.
+
+Recommended deployment options:
+
+- Render: easy Python web service deployment with automatic builds.
+- Railway or Vercel: good alternatives for small Python APIs.
+- Any host that can run `python -m src.main` and set environment variables.
+
+Render setup note:
+
+- Create a new Web Service on Render.
+- Use `python -m src.main` as the start command.
+- Set environment variables such as `DATABASE_URL`, `JWT_SECRET_KEY`, `USE_MOCK_LITHIC`, and optionally `LITHIC_API_KEY`.
+- Render automatically exposes the service on a public URL.
+
 
 ## JavaScript Example (Reference)
 
