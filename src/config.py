@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     debug: bool = False
     
     # Lithic API Configuration
-    lithic_api_key: str
+    lithic_api_key: str = ""
     lithic_api_base_url: str = "https://api.lithic.com"
     
     # Database Configuration

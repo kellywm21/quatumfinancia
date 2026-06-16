@@ -51,8 +51,16 @@ advancia-payledger/
 
 ### 2. Install Dependencies
 
+If `pip` is not available on your PATH, use your Python installation directly:
+
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
+```
+
+If your system has `py` installed on Windows, you can also use:
+
+```powershell
+py -m pip install -r requirements.txt
 ```
 
 ### 3. Configure Environment
@@ -68,6 +76,12 @@ DATABASE_URL=sqlite:///./payments.db
 ```
 
 If you want to use a real Lithic sandbox key, set `LITHIC_API_KEY` to that value and set `USE_MOCK_LITHIC=false`.
+
+This project also supports local mock mode without a Lithic API key. When running locally for development, keep:
+```
+USE_MOCK_LITHIC=true
+LITHIC_API_KEY=
+```
 
 If you want to use PostgreSQL instead of local SQLite, override `DATABASE_URL` with your database connection string:
 ```

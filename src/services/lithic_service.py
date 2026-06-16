@@ -1,15 +1,19 @@
 from lithic import Lithic, LithicError
 from src.config import settings
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 import uuid
 
 class LithicAPIClient:
     def __init__(self):
-        self.client = Lithic(
-            api_key=settings.lithic_api_key,
-            base_url=settings.lithic_api_base_url,
-            environment="sandbox" if "sandbox" in settings.lithic_api_base_url else "production"
-        )
+        self.use_mock = settings.use_mock_lithic or not bool(settings.lithic_api_key)
+        if self.use_mock:
+            self.client = None
+        else:
+            self.client = Lithic(
+                api_key=settings.lithic_api_key,
+                base_url=settings.lithic_api_base_url,
+                environment="sandbox" if "sandbox" in settings.lithic_api_base_url else "production"
+            )
     
     def _local_account_holder(self, email: str) -> Dict[str, Any]:
         return {
@@ -38,6 +42,9 @@ class LithicAPIClient:
     # Cardholder/Account Operations
     def create_cardholder(self, email: str, business_name: str = None) -> Dict[str, Any]:
         """Create a new cardholder account"""
+        if self.use_mock:
+            return self._local_account_holder(email)
+
         account_holder_data = {
             "first_name": "Business",
             "last_name": "Account",
@@ -69,6 +76,12 @@ class LithicAPIClient:
 
     def get_cardholder(self, account_token: str) -> Dict[str, Any]:
         """Retrieve cardholder details"""
+        if self.use_mock:
+            return {
+                "account_token": account_token,
+                "email": "unknown@example.com",
+                "status": "active"
+            }
         try:
             account_holder = self.client.account_holders.retrieve(account_token)
             return {
@@ -101,6 +114,9 @@ class LithicAPIClient:
         memo: str = None
     ) -> Dict[str, Any]:
         """Create a new virtual card"""
+        if self.use_mock:
+            return self._local_card(account_token, card_type, spend_limit, spend_limit_duration, memo)
+
         card_data = {
             "type": card_type,
             "account_token": account_token,
@@ -134,6 +150,14 @@ class LithicAPIClient:
     
     def get_card(self, card_token: str) -> Dict[str, Any]:
         """Retrieve card details"""
+        if self.use_mock:
+            return {
+                "card_token": card_token,
+                "pan": None,
+                "exp_month": 12,
+                "exp_year": 2099,
+                "status": "active",
+            }
         try:
             card = self.client.cards.retrieve(card_token)
             return {
@@ -164,6 +188,8 @@ class LithicAPIClient:
     
     def freeze_card(self, card_token: str) -> Dict[str, Any]:
         """Freeze a card by setting its state to PAUSED."""
+        if self.use_mock:
+            return {"card_token": card_token, "status": "PAUSED"}
         try:
             card = self.client.cards.update(card_token, state="PAUSED")
             return {
@@ -179,6 +205,8 @@ class LithicAPIClient:
 
     def unfreeze_card(self, card_token: str) -> Dict[str, Any]:
         """Unfreeze a card by setting its state to OPEN."""
+        if self.use_mock:
+            return {"card_token": card_token, "status": "OPEN"}
         try:
             card = self.client.cards.update(card_token, state="OPEN")
             return {
@@ -194,6 +222,8 @@ class LithicAPIClient:
     
     def list_cards(self, account_holder_token: str = None) -> list:
         """List cards, optionally filtered by account holder"""
+        if self.use_mock:
+            return []
         try:
             if account_holder_token:
                 cards = self.client.cards.list(account_holder_tokens=[account_holder_token])
